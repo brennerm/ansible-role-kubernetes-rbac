@@ -22,3 +22,27 @@
     state: present
     definition: "{{ lookup('template', 'clusterrolebinding.yml.j2', template_vars=dict(binding=item)) }}"
   loop: "{{ k8s_clusterrolebindings }}"
+
+- name: Determine and delete obsolete RoleBindings
+  block:
+    - name: Get current RoleBindings
+      set_fact:
+        current_rolebindings: "{{ lookup('community.kubernetes.k8s', kind='RoleBinding', label_selector='kubernetes.io/managed-by=ansible-role-kubernetes-rbac', wantlist=True) }}"
+    - name: Collect RoleBindings that need to be removed
+      set_fact:
+        rolebindings_to_remove: "{{ rolebindings_to_remove | default([]) + [dict(name=item.metadata.name, namespace=item.metadata.namespace)] }}"
+      loop: "{{ current_rolebindings }}"
+      when: k8s_rolebindings | json_query("[?name==\"" + item.metadata.name + "\" && namespace==\"" + item.metadata.namespace + "\"]") | list | length == 0
+      #when:  item.metadata.name + "zzz" == "read-podszzz"
+    - debug:
+        var: k8s_rolebindings | json_query('[?name=="' + item.metadata.name + '" && namespace=="' + item.metadata.namespace + '"]') | list | length == 0
+      loop: "{{ current_rolebindings }}"
+    - debug:
+        var: rolebindings_to_remove
+    #- name: Delete obsolete RoleBinding
+    #  community.kubernetes.k8s:
+    #    state: absent
+    #    definition: "{{ lookup('template', 'rolebinding.yml.j2', template_vars=dict(binding=dict(name=item.metadata.name, namespace=item.metadata.namespace))) }}"
+    #  when: k8s_rolebindings | json_query('[?name=="' + item.metadata.name + '" && namespace=="' + item.metadata.namespace + '"]') | list | length == 0
+    #  loop: "{{ current_rolebindings }}"
+  when: cleanup_rolebindings
