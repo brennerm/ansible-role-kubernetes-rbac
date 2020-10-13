@@ -1,0 +1,24 @@
+---
+- name: Create Roles
+  community.kubernetes.k8s:
+    state: present
+    definition: "{{ lookup('template', 'role.yml.j2', template_vars=dict(role=item)) }}"
+  loop: "{{ k8s_roles }}"
+
+- name: Create ClusterRoles
+  community.kubernetes.k8s:
+    state: present
+    definition: "{{ lookup('template', 'clusterrole.yml.j2', template_vars=dict(role=item)) }}"
+  loop: "{{ k8s_clusterroles }}"
+
+- name: Create RoleBindings
+  community.kubernetes.k8s:
+    state: present
+    definition: "{{ lookup('template', 'rolebinding.yml.j2', template_vars=dict(binding=item)) }}"
+  loop: "{{ k8s_rolebindings }}"
+
+- name: Create ClusterRoleBindings
+  community.kubernetes.k8s:
+    state: present
+    definition: "{{ lookup('template', 'clusterrolebinding.yml.j2', template_vars=dict(binding=item)) }}"
+  loop: "{{ k8s_clusterrolebindings }}"

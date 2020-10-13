@@ -1,0 +1,22 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ binding.name }}
+  labels:
+    kubernetes.io/managed-by: ansible-role-kubernetes-rbac
+subjects:
+{% for user in binding.users %}
+- kind: User
+  name: {{ user.name }}
+  apiGroup: rbac.authorization.k8s.io
+{% endfor %}
+{% for group in binding.groups %}
+- kind: Group
+  name: {{ group.name }}
+  apiGroup: rbac.authorization.k8s.io
+{% endfor %}
+roleRef:
+  kind: ClusterRole
+  name: {{ binding.role }}
+  apiGroup: rbac.authorization.k8s.io
+
