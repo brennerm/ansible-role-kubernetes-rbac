@@ -11,7 +11,12 @@ This role uses the community.kubernetes.k8s module which needs some [requirement
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+- k8s_roles: A list of parameters for [Role](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#role-and-clusterrole) resources that will be created
+- k8s_clusterroles: A list of parameters for [ClusterRole](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#role-and-clusterrole) resources that will be created
+- k8s_rolebindings: A list of parameters for [RoleBinding](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#rolebinding-and-clusterrolebinding) resources that will be created
+- k8s_clusterrolebindings: A list of parameters for [ClusterRoleBinding](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#rolebinding-and-clusterrolebinding) resources that will be created
+
+Check the [defaults/main.yml](defaults/main.yml) for some examples.
 
 Switching between Kubernetes cluster
 ------------------------------------
@@ -29,7 +34,7 @@ Example Playbook
       namespace: default
       rules:
       - resources: ["pods"]
-          verbs: ["get", "watch", "list"]
+        verbs: ["get", "watch", "list"]
     k8s_rolebindings:
     - name: read-pods
       namespace: default
