@@ -1,0 +1,7 @@
+- set_fact:
+    query: "[?name=='{{ item.metadata.name }}' && namespace=='{{ item.metadata.namespace }}']"
+- name: Delete obsolete RoleBinding
+  community.kubernetes.k8s:
+    state: absent
+    definition: "{{ lookup('template', 'rolebinding.yml.j2', template_vars=dict(binding=dict(name=item.metadata.name, namespace=item.metadata.namespace))) }}"
+  when: k8s_rolebindings | json_query(query) | list | length == 0

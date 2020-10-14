@@ -1,0 +1,7 @@
+- set_fact:
+    query: "[?name=='{{ item.metadata.name }}' && namespace=='{{ item.metadata.namespace }}']"
+- name: Delete obsolete Role
+  community.kubernetes.k8s:
+    state: absent
+    definition: "{{ lookup('template', 'role.yml.j2', template_vars=dict(role=dict(name=item.metadata.name, namespace=item.metadata.namespace))) }}"
+  when: k8s_roles | json_query(query) | list | length == 0

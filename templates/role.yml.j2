@@ -2,11 +2,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   namespace: {{ role.namespace | default('default') }}
-  name: {{ role.name }}
+  name: {{ role.name | default("") }}
   labels:
     kubernetes.io/managed-by: ansible-role-kubernetes-rbac
 rules:
-{% for rule in role.rules %}
+{% for rule in role.rules | default([]) %}
 - apiGroups: {{ rule.apiGroups | default(['']) | to_yaml }}
   resources: {{ rule.resources | to_yaml }}
   verbs: {{ rule.verbs | to_yaml }}

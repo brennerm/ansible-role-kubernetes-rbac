@@ -1,0 +1,7 @@
+- set_fact:
+    query: "[?name=='{{ item.metadata.name }}']"
+- name: Delete obsolete ClusterRole
+  community.kubernetes.k8s:
+    state: absent
+    definition: "{{ lookup('template', 'clusterrole.yml.j2', template_vars=dict(role=dict(name=item.metadata.name))) }}"
+  when: k8s_clusterroles | json_query(query) | list | length == 0

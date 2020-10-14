@@ -28,21 +28,33 @@
     - name: Get current RoleBindings
       set_fact:
         current_rolebindings: "{{ lookup('community.kubernetes.k8s', kind='RoleBinding', label_selector='kubernetes.io/managed-by=ansible-role-kubernetes-rbac', wantlist=True) }}"
-    - name: Collect RoleBindings that need to be removed
-      set_fact:
-        rolebindings_to_remove: "{{ rolebindings_to_remove | default([]) + [dict(name=item.metadata.name, namespace=item.metadata.namespace)] }}"
+    - include: delete_rolebinding.yml
       loop: "{{ current_rolebindings }}"
-      when: k8s_rolebindings | json_query("[?name==\"" + item.metadata.name + "\" && namespace==\"" + item.metadata.namespace + "\"]") | list | length == 0
-      #when:  item.metadata.name + "zzz" == "read-podszzz"
-    - debug:
-        var: k8s_rolebindings | json_query('[?name=="' + item.metadata.name + '" && namespace=="' + item.metadata.namespace + '"]') | list | length == 0
-      loop: "{{ current_rolebindings }}"
-    - debug:
-        var: rolebindings_to_remove
-    #- name: Delete obsolete RoleBinding
-    #  community.kubernetes.k8s:
-    #    state: absent
-    #    definition: "{{ lookup('template', 'rolebinding.yml.j2', template_vars=dict(binding=dict(name=item.metadata.name, namespace=item.metadata.namespace))) }}"
-    #  when: k8s_rolebindings | json_query('[?name=="' + item.metadata.name + '" && namespace=="' + item.metadata.namespace + '"]') | list | length == 0
-    #  loop: "{{ current_rolebindings }}"
   when: cleanup_rolebindings
+
+- name: Determine and delete obsolete ClusterRoleBindings
+  block:
+    - name: Get current ClusterRoleBindings
+      set_fact:
+        current_clusterrolebindings: "{{ lookup('community.kubernetes.k8s', kind='ClusterRoleBinding', label_selector='kubernetes.io/managed-by=ansible-role-kubernetes-rbac', wantlist=True) }}"
+    - include: delete_clusterrolebinding.yml
+      loop: "{{ current_clusterrolebindings }}"
+  when: cleanup_clusterrolebindings
+
+- name: Determine and delete obsolete Roles
+  block:
+    - name: Get current Roles
+      set_fact:
+        current_roles: "{{ lookup('community.kubernetes.k8s', kind='Role', label_selector='kubernetes.io/managed-by=ansible-role-kubernetes-rbac', wantlist=True) }}"
+    - include: delete_role.yml
+      loop: "{{ current_roles }}"
+  when: cleanup_roles
+
+- name: Determine and delete obsolete ClusterRoles
+  block:
+    - name: Get current ClusterRoles
+      set_fact:
+        current_clusterroles: "{{ lookup('community.kubernetes.k8s', kind='ClusterRole', label_selector='kubernetes.io/managed-by=ansible-role-kubernetes-rbac', wantlist=True) }}"
+    - include: delete_clusterrole.yml
+      loop: "{{ current_clusterroles }}"
+  when: cleanup_clusterroles

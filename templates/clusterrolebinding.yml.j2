@@ -5,18 +5,18 @@ metadata:
   labels:
     kubernetes.io/managed-by: ansible-role-kubernetes-rbac
 subjects:
-{% for user in binding.users %}
+{% for user in binding.users | default([]) %}
 - kind: User
   name: {{ user.name }}
   apiGroup: rbac.authorization.k8s.io
 {% endfor %}
-{% for group in binding.groups %}
+{% for group in binding.groups | default([]) %}
 - kind: Group
   name: {{ group.name }}
   apiGroup: rbac.authorization.k8s.io
 {% endfor %}
 roleRef:
   kind: ClusterRole
-  name: {{ binding.role }}
+  name: {{ binding.role | default("") }}
   apiGroup: rbac.authorization.k8s.io
 
