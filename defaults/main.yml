@@ -1,37 +1,37 @@
 ---
-k8s_roles: #[]
-- name: pod-reader
-  namespace: default
-  rules:
-    - resources: ["pods"] 
-      verbs: ["get", "watch", "list"]
-k8s_clusterroles: #[]
-- name: secret-reader
-  rules:
-    - resources: ["secrets"] 
-      verbs: ["get", "watch", "list"]
-k8s_rolebindings: #[]
-- name: read-pods
-  namespace: default
-  users:
-    - name: jane
-  groups:
-    - name: pod-readers
-  role: pod-reader
-- name: read-pods-1
-  namespace: default
-  users:
-    - name: tom
-  groups:
-    - name: pod-readers
-  role: pod-reader
-k8s_clusterrolebindings: #[]
-- name: read-secrets
-  users:
-    - name: tom
-  groups:
-    - name: secret-readers
-  role: secret-reader
+k8s_roles: []
+#- name: pod-reader
+#  namespace: default
+#  rules:
+#    - resources: ["pods"] 
+#      verbs: ["get", "watch", "list"]
+k8s_clusterroles: []
+#- name: secret-reader
+#  rules:
+#    - resources: ["secrets"] 
+#      verbs: ["get", "watch", "list"]
+k8s_rolebindings: []
+#- name: read-pods
+#  namespace: default
+#  users:
+#    - name: jane
+#  groups:
+#    - name: pod-readers
+#  role: pod-reader
+#- name: read-pods-1
+#  namespace: default
+#  users:
+#    - name: tom
+#  groups:
+#    - name: pod-readers
+#  role: pod-reader
+k8s_clusterrolebindings: []
+#- name: read-secrets
+#  users:
+#    - name: tom
+#  groups:
+#    - name: secret-readers
+#  role: secret-reader
 cleanup_roles: false
 cleanup_clusterroles: false
 cleanup_rolebindings: true
