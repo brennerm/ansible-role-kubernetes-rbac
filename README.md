@@ -26,6 +26,7 @@ Read through the [community.kubernetes.k8s module documentation](https://docs.an
 Example Playbook
 ----------------
 
+```yaml
 - hosts: localhost
   roles:
   - role: ansible-role-kubernetes-rbac
@@ -43,6 +44,7 @@ Example Playbook
       groups:
       - name: pod-readers
       role: pod-reader
+```
 
 License
 -------
