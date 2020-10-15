@@ -1,0 +1,32 @@
+default:
+  image: python:3-alpine
+  before_script:
+    - apk add --no-cache curl docker python3-dev libffi-dev openssl-dev build-base
+    - curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.9.0/kind-linux-amd64
+    - chmod +x ./kind
+    - mv ./kind /usr/local/bin/kind
+    - kind version
+    - curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+    - chmod +x ./kubectl
+    - mv ./kubectl /usr/local/bin/kubectl
+    - kubectl version --client
+    - pip3 install ansible openshift
+    - ansible --version
+    - ansible-galaxy collection install community.kubernetes
+    - kind create cluster --wait 180s
+    - kind get kubeconfig
+    - docker ps
+    - kubectl get pods -A
+
+variables:
+  DOCKER_HOST: tcp://docker:2375
+
+test:
+  services:
+    - docker:dind
+  script:
+    - ansible-playbook tests/create.yml
+    - kubectl get rolebindings | grep read-pods
+    - kubectl get roles | grep pod-reader
+    - kubectl get clusterrolebindings | grep read-secrets
+    - kubectl get clusterroles | grep secret-reader
